@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Restaurant Management</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    :root {
+      --primary: #4f6df5;
+      --primary-dark: #3a56d5;
+      --secondary: #10B981;
+      --accent: #F59E0B;
+      --danger: #EF4444;
+      --dark: #1F2937;
+      --light: #F9FAFB;
+      --gray: #6B7280;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .dashboard-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 1200px;
+      overflow: hidden;
+    }
+
+    .dashboard-header {
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 30px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .user-details h3 {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .user-details p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    #logout {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid white;
+      color: white;
+      padding: 10px 25px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    #logout:hover {
+      background: white;
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .dashboard-content {
+      padding: 40px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      min-height: 500px;
+    }
+
+    .welcome-card {
+      grid-column: 1 / -1;
+      background: linear-gradient(90deg, var(--light), #ffffff);
+      border-radius: 15px;
+      padding: 40px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .welcome-card h2 {
+      color: var(--dark);
+      margin-bottom: 15px;
+      font-size: 32px;
+    }
+
+    .welcome-card p {
+      color: var(--gray);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    .card {
+      background: var(--light);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      border: 1px solid #e6e9ff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary);
+    }
+
+    .card-icon {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 25px;
+      color: white;
+      font-size: 28px;
+    }
+
+    .card h3 {
+      color: var(--dark);
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+
+    .card p {
+      color: var(--gray);
+      line-height: 1.6;
+      font-size: 15px;
+      margin-bottom: 25px;
+      flex-grow: 1;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      flex: 1;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--dark);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--light);
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+      grid-column: 1 / -1;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+      }
+      
+      .dashboard-content {
+        padding: 20px;
+        grid-template-columns: 1fr;
+      }
+      
+      .welcome-card {
+        padding: 30px 20px;
+      }
+      
+      .welcome-card h2 {
+        font-size: 24px;
+      }
+      
+      .card-actions {
+        flex-direction: column;
+      }
+    }
+
+    .stats {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e6e9ff;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .menu-preview {
+      grid-column: 1 / -1;
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .menu-preview h3 {
+      color: var(--dark);
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+
+    .menu-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .menu-item-preview {
+      background: var(--light);
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid #e6e9ff;
+    }
+
+    .menu-item-preview h4 {
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <div class="user-details">
+          <h3 id="userName">Loading...</h3>
+          <p id="userEmail">Loading...</p>
+        </div>
+      </div>
+      <button id="logout">Logout</button>
+    </div>
+
+    <div class="dashboard-content" id="dashboardContent">
+      <div class="loading" id="loadingIndicator">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  
+  <script>
+    // Firebase Config - MUST USE YOUR CONFIG
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWfnhGX8pyJyL7PRRRYt1vBOsK1oc7iBU",
+      authDomain: "testknow-fb51b.firebaseapp.com",
+      projectId: "testknow-fb51b",
+      storageBucket: "testknow-fb51b.firebasestorage.app",
+      messagingSenderId: "593982566670",
+      appId: "1:593982566670:web:127db7f0e46ef65868275f",
+      measurementId: "G-FTLTX27059"
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Check authentication
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        // User not logged in, redirect to login
+        window.location.href = "login.html";
+        return;
+      }
+
+      // User is logged in, show dashboard
+      document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+      document.getElementById('userEmail').textContent = user.email;
+      document.getElementById('userAvatar').textContent = user.displayName ? 
+        user.displayName.charAt(0).toUpperCase() : 
+        user.email.charAt(0).toUpperCase();
+      
+      showDashboardContent(user);
+    });
+
+    function showDashboardContent(user) {
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const dashboardContent = document.getElementById('dashboardContent');
+      
+      loadingIndicator.style.display = 'none';
+      
+      dashboardContent.innerHTML = `
+        <div class="welcome-card">
+          <h2>Welcome, ${user.displayName || user.email.split('@')[0]}! 👋</h2>
+          <p>Manage your restaurant menu, categories, and offers from this dashboard.</p>
+        </div>
+        
+        <div class="card">
+          <div class="card-icon">📁</div>
+          <h3>Category Management</h3>
+          <p>Create and manage menu categories. Organize your menu items by type (Appetizers, Main Course, Desserts, etc.)</p>
+          <div class="card-actions">
+            <a href="category-management.html" class="btn btn-primary">Manage Categories</a>
+            <button class="btn btn-secondary" onclick="showCategoryHelp()">Learn More</button>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-icon">🍽️</div>
+          <h3>Menu Management</h3>
+          <p>Add, edit, or remove menu items. Set prices, add descriptions, upload images, and create special offers.</p>
+          <div class="card-actions">
+            <a href="menu-management.html" class="btn btn-primary">Manage Menu Items</a>
+            <button class="btn btn-secondary" onclick="showMenuHelp()">Quick Guide</button>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h3>Analytics & Reports</h3>
+          <p>View sales reports, popular items, and customer insights. Track your restaurant's performance.</p>
+          <div class="card-actions">
+            <button class="btn btn-primary" onclick="viewReports()">View Reports</button>
+            <button class="btn btn-secondary" onclick="showAnalyticsHelp()">How to Use</button>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-icon">⚙️</div>
+          <h3>Settings</h3>
+          <p>Configure restaurant settings, manage users, and customize your dashboard preferences.</p>
+          <div class="card-actions">
+            <button class="btn btn-primary" onclick="openSettings()">Open Settings</button>
+            <button class="btn btn-secondary" onclick="showSettingsHelp()">Help</button>
+          </div>
+        </div>
+        
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-value" id="totalCategories">0</div>
+            <div class="stat-label">Categories</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="totalMenuItems">0</div>
+            <div class="stat-label">Menu Items</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="featuredItems">0</div>
+            <div class="stat-label">Featured Items</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="activeOffers">0</div>
+            <div class="stat-label">Active Offers</div>
+          </div>
+        </div>
+        
+        <div class="menu-preview">
+          <h3>Recent Menu Items</h3>
+          <div class="menu-items" id="recentMenuItems">
+            <div class="menu-item-preview">
+              <h4>No items yet</h4>
+              <p>Create your first menu item to see it here</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Load statistics and recent items
+      loadDashboardStats();
+    }
+
+    async function loadDashboardStats() {
+      try {
+        // Load categories count
+        const categoriesSnapshot = await db.collection("categories").get();
+        document.getElementById('totalCategories').textContent = categoriesSnapshot.size;
+        
+        // Load menu items count
+        const menuSnapshot = await db.collection("menuItems").get();
+        document.getElementById('totalMenuItems').textContent = menuSnapshot.size;
+        
+        // Count featured items
+        const featuredSnapshot = await db.collection("menuItems")
+          .where("featured", "==", true)
+          .get();
+        document.getElementById('featuredItems').textContent = featuredSnapshot.size;
+        
+        // Count active offers (items with expiry date in future)
+        const now = new Date();
+        const offersSnapshot = await db.collection("menuItems")
+          .where("expiry", ">=", now.toISOString().split('T')[0])
+          .get();
+        document.getElementById('activeOffers').textContent = offersSnapshot.size;
+        
+        // Load recent menu items
+        const recentSnapshot = await db.collection("menuItems")
+          .orderBy("createdAt", "desc")
+          .limit(3)
+          .get();
+        
+        const recentContainer = document.getElementById('recentMenuItems');
+        if (recentSnapshot.empty) {
+          recentContainer.innerHTML = `
+            <div class="menu-item-preview">
+              <h4>No items yet</h4>
+              <p>Create your first menu item to see it here</p>
+            </div>
+          `;
+        } else {
+          let html = '';
+          recentSnapshot.forEach(doc => {
+            const item = doc.data();
+            html += `
+              <div class="menu-item-preview">
+                <h4>${item.name}</h4>
+                <p>${item.description.substring(0, 60)}${item.description.length > 60 ? '...' : ''}</p>
+                <p><strong>Price:</strong> $${item.price.toFixed(2)}</p>
+                ${item.featured ? '<span style="color: var(--accent); font-size: 12px;">★ Featured</span>' : ''}
+              </div>
+            `;
+          });
+          recentContainer.innerHTML = html;
+        }
+      } catch (error) {
+        console.error("Error loading dashboard stats:", error);
+      }
+    }
+
+    // Helper functions
+    function showCategoryHelp() {
+      alert("Categories help organize your menu. Create categories like 'Appetizers', 'Main Course', 'Desserts', etc. Then assign menu items to these categories.");
+    }
+
+    function showMenuHelp() {
+      alert("Add menu items with details like name, price, description, and image. You can mark items as featured, add discounts, and set expiry dates for special offers.");
+    }
+
+    function viewReports() {
+      alert("Reports feature coming soon! You'll be able to view sales analytics and customer insights.");
+    }
+
+    function openSettings() {
+      alert("Settings feature coming soon! Configure your restaurant preferences.");
+    }
+
+    function showAnalyticsHelp() {
+      alert("Analytics will show you which items are popular, sales trends, and customer preferences.");
+    }
+
+    function showSettingsHelp() {
+      alert("Settings allow you to customize your restaurant's appearance and manage user permissions.");
+    }
+
+    // Logout
+    document.getElementById("logout").addEventListener("click", () => {
+      auth.signOut().then(() => {
+        window.location.href = "login.html";
+      }).catch((error) => {
+        console.error("Logout error:", error);
+        alert("Error logging out: " + error.message);
+      });
+    });
+  </script>
+</body>
+</html>
