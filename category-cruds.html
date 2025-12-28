@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category CRUDS | Restaurant Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4f6df5;
+            --primary-dark: #3a56d5;
+            --secondary: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --dark: #1F2937;
+            --light: #F9FAFB;
+            --gray: #6B7280;
+        }
+
+        body {
+            background: #F3F4F6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            color: var(--dark);
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header-left p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid #D1D5DB;
+        }
+
+        .btn-secondary:hover {
+            background: #E5E7EB;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+
+        /* Main Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        /* Form Panel */
+        .form-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .form-title {
+            font-size: 20px;
+            color: var(--dark);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 109, 245, 0.1);
+        }
+
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #E5E7EB;
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        /* Categories Panel */
+        .categories-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .panel-title {
+            font-size: 22px;
+            color: var(--dark);
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Categories Grid */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: var(--light);
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .category-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .category-color {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: white;
+            color: var(--gray);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .category-description {
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+
+        .category-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .item-count {
+            font-size: 13px;
+            color: var(--gray);
+            background: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .category-date {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            color: #D1D5DB;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            color: var(--gray);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .empty-desc {
+            color: #9CA3AF;
+            font-size: 14px;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            grid-column: 1 / -1;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #F3F4F6;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Message */
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .message.success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+            display: block;
+        }
+
+        .message.error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+            display: block;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            margin-bottom: 25px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-panel {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+       
+        .debug-panel {
+            background: #1e293b;
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .debug-toggle {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>Category CRUDS System</h1>
+                <p>Create, Read, Update, Delete, and Search categories</p>
+                <button class="debug-toggle" onclick="toggleDebug()">Toggle Debug</button>
+            </div>
+            <div>
+                <button class="btn btn-secondary" onclick="window.location.href='index.html'">
+                    ← Back to Dashboard
+                </button>
+            </div>
+        </header>
+
+        <!-- Debug Panel -->
+        <div id="debugPanel" class="debug-panel">
+            <div id="debugLog"></div>
+        </div>
+
+        <!-- Message Area -->
+        <div id="message" class="message"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Form Panel -->
+            <div class="form-panel">
+                <h3 class="form-title" id="formTitle">Add New Category</h3>
+                
+                <form id="categoryForm">
+                    <div class="form-group">
+                        <label class="form-label">Category Name *</label>
+                        <input type="text" id="categoryName" class="form-control" placeholder="e.g., Appetizers, Main Course" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Display Color</label>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <input type="color" id="categoryColor" class="color-preview" value="#4f6df5" title="Click to choose color">
+                            <span id="colorValue" style="font-size: 14px; color: var(--gray);">#4f6df5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea id="categoryDescription" class="form-control" rows="4" placeholder="Describe this category..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            💾 Save Category
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            ↺ Clear Form
+                        </button>
+                        <button type="button" class="btn btn-warning" onclick="testFirebaseConnection()">
+                            🔧 Test Connection
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Categories Panel -->
+            <div class="categories-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">All Categories</h3>
+                    <div>
+                        <button class="btn btn-primary" onclick="refreshCategories()">
+                            🔄 Refresh
+                        </button>
+                        <button class="btn btn-secondary" onclick="createSampleCategories()">
+                            🧪 Add Samples
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search Box -->
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search categories by name or description...">
+                    <button class="search-btn" onclick="searchCategories()">🔍</button>
+                </div>
+
+                <!-- Categories Grid -->
+                <div class="categories-grid" id="categoriesContainer">
+                    <div class="loading" id="loadingIndicator">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Delete</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this category?</p>
+                <p><strong>Note:</strong> Menu items in this category will not be deleted.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Delete Category</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <script>
+        // Firebase Config - Make sure this matches YOUR Firebase project
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWfnhGX8pyJyL7PRRRYt1vBOsK1oc7iBU",
+            authDomain: "testknow-fb51b.firebaseapp.com",
+            projectId: "testknow-fb51b",
+            storageBucket: "testknow-fb51b.firebasestorage.app",
+            messagingSenderId: "593982566670",
+            appId: "1:593982566670:web:127db7f0e46ef65868275f",
+            measurementId: "G-FTLTX27059"
+        };
+
+        // Debug logging
+        function debugLog(message, type = 'info') {
+            const debugLog = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#f87171' : type === 'success' ? '#34d399' : '#60a5fa';
+            
+            debugLog.innerHTML += `<div style="color: ${color}; margin-bottom: 5px;">
+                [${timestamp}] ${message}
+            </div>`;
+            debugLog.scrollTop = debugLog.scrollHeight;
+            
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function toggleDebug() {
+            const panel = document.getElementById('debugPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Initialize Firebase
+        let auth, db;
+        try {
+            debugLog('Initializing Firebase...');
+            
+            // Check if Firebase is already initialized
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                debugLog('Firebase initialized successfully', 'success');
+            } else {
+                firebase.app(); // Use existing app
+                debugLog('Using existing Firebase app', 'info');
+            }
+            
+            auth = firebase.auth();
+            db = firebase.firestore();
+            
+            debugLog('Firebase services initialized', 'success');
+            
+        } catch (error) {
+            debugLog(`Firebase initialization error: ${error.message}`, 'error');
+            showMessage(`Firebase Error: ${error.message}`, 'error');
+        }
+
+        // State variables
+        let currentCategoryId = null;
+        let isEditMode = false;
+        let allCategories = [];
+
+        // Check authentication
+        if (auth) {
+            auth.onAuthStateChanged((user) => {
+                if (!user) {
+                    debugLog('User not authenticated, redirecting to login', 'warning');
+                    window.location.href = "login.html";
+                    return;
+                }
+                
+                debugLog(`User authenticated: ${user.email}`, 'success');
+                loadCategories();
+            });
+        } else {
+            debugLog('Auth service not available', 'error');
+        }
+
+        // Initialize color picker
+        document.getElementById('categoryColor').addEventListener('input', function() {
+            document.getElementById('colorValue').textContent = this.value;
+        });
+
+        // Test Firebase connection
+        async function testFirebaseConnection() {
+            debugLog('Testing Firebase connection...');
+            
+            try {
+                // Test authentication
+                const user = auth.currentUser;
+                if (!user) {
+                    debugLog('No user authenticated', 'error');
+                    showMessage('Please login first', 'error');
+                    return;
+                }
+                
+                debugLog(`Authenticated as: ${user.email}`, 'success');
+                
+                // Test Firestore write
+                const testData = {
+                    test: true,
+                    timestamp: new Date().toISOString(),
+                    user: user.email
+                };
+                
+                debugLog('Attempting to write test document...');
+                const testRef = await db.collection('_tests').add(testData);
+                debugLog(`Test document written with ID: ${testRef.id}`, 'success');
+                
+                // Test Firestore read
+                debugLog('Attempting to read test document...');
+                const testDoc = await testRef.get();
+                debugLog(`Test document read: ${JSON.stringify(testDoc.data())}`, 'success');
+                
+                // Clean up test document
+                await testRef.delete();
+                debugLog('Test document cleaned up', 'success');
+                
+                showMessage('Firebase connection test successful!', 'success');
+                
+            } catch (error) {
+                debugLog(`Connection test failed: ${error.message}`, 'error');
+                debugLog(`Error code: ${error.code}`, 'error');
+                showMessage(`Connection test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Load all categories
+        async function loadCategories() {
+            debugLog('Loading categories...');
+            
+            try {
+                const container = document.getElementById('categoriesContainer');
+                const loadingIndicator = document.getElementById('loadingIndicator');
+                
+                loadingIndicator.style.display = 'flex';
+                
+                debugLog('Querying categories collection...');
+                const snapshot = await db.collection("categories")
+                    .orderBy("createdAt", "desc")
+                    .get();
+                
+                loadingIndicator.style.display = 'none';
+                allCategories = [];
+                
+                debugLog(`Found ${snapshot.size} categories`, 'success');
+                
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📁</div>
+                            <h3 class="empty-title">No Categories Found</h3>
+                            <p class="empty-desc">Create your first category to get started</p>
+                        </div>
+                    `;
+                    debugLog('No categories found in database', 'info');
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const category = {
+                        id: doc.id,
+                        ...doc.data()
+                    };
+                    allCategories.push(category);
+                    
+                    const date = category.createdAt?.toDate() || new Date();
+                    const formattedDate = date.toLocaleDateString();
+                    
+                    html += `
+                        <div class="category-card">
+                            <div class="category-header">
+                                <div class="category-color" style="background: ${category.color || '#4f6df5'}"></div>
+                                <div class="category-actions">
+                                    <button class="action-btn" onclick="editCategory('${doc.id}')" title="Edit">
+                                        ✏️
+                                    </button>
+                                    <button class="action-btn delete" onclick="showDeleteModal('${doc.id}')" title="Delete">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <h4 class="category-title">${category.name}</h4>
+                            <p class="category-description">${category.description || 'No description provided'}</p>
+                            
+                            <div class="category-footer">
+                                <span class="item-count">${category.menuCount || 0} items</span>
+                                <span class="category-date">Created: ${formattedDate}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+                debugLog('Categories loaded successfully', 'success');
+                
+            } catch (error) {
+                debugLog(`Error loading categories: ${error.message}`, 'error');
+                debugLog(`Error code: ${error.code}`, 'error');
+                showMessage("Failed to load categories: " + error.message, "error");
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('categoryName').value.trim();
+            const color = document.getElementById('categoryColor').value;
+            const description = document.getElementById('categoryDescription').value.trim();
+            
+            if (!name) {
+                showMessage("Category name is required", "error");
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Saving...";
+
+            debugLog(`Saving category: ${name}`);
+            debugLog(`Color: ${color}`);
+            debugLog(`Description: ${description}`);
+            debugLog(`Edit mode: ${isEditMode}`);
+            debugLog(`Current ID: ${currentCategoryId}`);
+
+            try {
+                // Get current user
+                const user = auth.currentUser;
+                if (!user) {
+                    throw new Error('User not authenticated');
+                }
+                
+                debugLog(`User UID: ${user.uid}`);
+
+                const categoryData = {
+                    name: name,
+                    color: color,
+                    description: description,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: user.email,
+                    updatedById: user.uid
+                };
+
+                if (isEditMode && currentCategoryId) {
+                    // Update existing category
+                    debugLog(`Updating existing category with ID: ${currentCategoryId}`);
+                    await db.collection("categories").doc(currentCategoryId).update(categoryData);
+                    debugLog('Category updated successfully', 'success');
+                    showMessage("Category updated successfully!", "success");
+                } else {
+                    // Create new category
+                    debugLog('Creating new category...');
+                    categoryData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    categoryData.menuCount = 0;
+                    categoryData.createdBy = user.email;
+                    categoryData.createdById = user.uid;
+                    
+                    const docRef = await db.collection("categories").add(categoryData);
+                    currentCategoryId = docRef.id;
+                    
+                    debugLog(`Category created with ID: ${docRef.id}`, 'success');
+                    showMessage("Category created successfully!", "success");
+                }
+
+                resetForm();
+                loadCategories();
+                
+            } catch (error) {
+                debugLog(`Error saving category: ${error.message}`, 'error');
+                debugLog(`Error code: ${error.code}`, 'error');
+                debugLog(`Error stack: ${error.stack}`, 'error');
+                
+                let errorMessage = "Failed to save category: ";
+                
+                if (error.code === 'permission-denied') {
+                    errorMessage += "Permission denied. Check Firebase Security Rules.";
+                } else if (error.code === 'unauthenticated') {
+                    errorMessage += "You need to login again.";
+                    window.location.href = "login.html";
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                showMessage(errorMessage, "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "💾 Save Category";
+            }
+        });
+
+        // Edit category
+        async function editCategory(categoryId) {
+            debugLog(`Editing category: ${categoryId}`);
+            
+            try {
+                const doc = await db.collection("categories").doc(categoryId).get();
+                if (doc.exists) {
+                    const category = doc.data();
+                    
+                    document.getElementById('categoryName').value = category.name;
+                    document.getElementById('categoryColor').value = category.color || '#4f6df5';
+                    document.getElementById('colorValue').textContent = category.color || '#4f6df5';
+                    document.getElementById('categoryDescription').value = category.description || '';
+                    
+                    currentCategoryId = categoryId;
+                    isEditMode = true;
+                    
+                    document.getElementById('formTitle').textContent = "Edit Category";
+                    document.getElementById('submitBtn').textContent = "💾 Update Category";
+                    document.getElementById('categoryName').focus();
+                    
+                    // Scroll to form
+                    document.getElementById('categoryForm').scrollIntoView({ behavior: 'smooth' });
+                    
+                    debugLog(`Loaded category: ${category.name}`, 'success');
+                    showMessage("Editing category...", "info");
+                } else {
+                    debugLog('Category not found', 'error');
+                    showMessage("Category not found", "error");
+                }
+            } catch (error) {
+                debugLog(`Error loading category: ${error.message}`, 'error');
+                showMessage("Failed to load category", "error");
+            }
+        }
+
+        // Create sample categories for testing
+        async function createSampleCategories() {
+            debugLog('Creating sample categories...');
+            
+            const sampleCategories = [
+                {
+                    name: "Appetizers",
+                    description: "Starters and small plates to begin your meal",
+                    color: "#4f6df5"
+                },
+                {
+                    name: "Main Course",
+                    description: "Main dishes and entrees",
+                    color: "#10B981"
+                },
+                {
+                    name: "Desserts",
+                    description: "Sweet treats to finish your meal",
+                    color: "#F59E0B"
+                },
+                {
+                    name: "Drinks",
+                    description: "Beverages, cocktails, and non-alcoholic drinks",
+                    color: "#8B5CF6"
+                },
+                {
+                    name: "Special Offers",
+                    description: "Limited time offers and promotions",
+                    color: "#EF4444"
+                }
+            ];
+
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    showMessage("Please login first", "error");
+                    return;
+                }
+
+                for (const category of sampleCategories) {
+                    const categoryData = {
+                        ...category,
+                        menuCount: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdBy: user.email,
+                        createdById: user.uid,
+                        updatedBy: user.email,
+                        updatedById: user.uid
+                    };
+                    
+                    await db.collection("categories").add(categoryData);
+                    debugLog(`Created sample category: ${category.name}`, 'success');
+                }
+                
+                showMessage("Sample categories created successfully!", "success");
+                loadCategories();
+                
+            } catch (error) {
+                debugLog(`Error creating sample categories: ${error.message}`, 'error');
+                showMessage("Failed to create sample categories: " + error.message, "error");
+            }
+        }
+
+        // Show delete modal
+        function showDeleteModal(categoryId) {
+            currentCategoryId = categoryId;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            currentCategoryId = null;
+        }
+
+        // Handle delete confirmation
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            debugLog(`Deleting category: ${currentCategoryId}`);
+            
+            try {
+                // Update menu items to remove category reference instead of deleting them
+                const menuItemsSnapshot = await db.collection("menuItems")
+                    .where("categoryId", "==", currentCategoryId)
+                    .get();
+                
+                if (!menuItemsSnapshot.empty) {
+                    debugLog(`Found ${menuItemsSnapshot.size} items in this category, updating them...`);
+                    const batch = db.batch();
+                    menuItemsSnapshot.forEach(doc => {
+                        batch.update(doc.ref, {
+                            categoryId: "",
+                            categoryName: "Uncategorized",
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    });
+                    await batch.commit();
+                    debugLog('Menu items updated', 'success');
+                }
+                
+                // Delete the category
+                await db.collection("categories").doc(currentCategoryId).delete();
+                
+                debugLog('Category deleted successfully', 'success');
+                showMessage("Category deleted successfully!", "success");
+                closeDeleteModal();
+                loadCategories();
+            } catch (error) {
+                debugLog(`Error deleting category: ${error.message}`, 'error');
+                showMessage("Failed to delete category: " + error.message, "error");
+            }
+        });
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryColor').value = '#4f6df5';
+            document.getElementById('colorValue').textContent = '#4f6df5';
+            currentCategoryId = null;
+            isEditMode = false;
+            document.getElementById('formTitle').textContent = "Add New Category";
+            document.getElementById('submitBtn').textContent = "💾 Save Category";
+            debugLog('Form reset');
+        }
+
+        // Refresh categories
+        function refreshCategories() {
+            debugLog('Refreshing categories...');
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            document.getElementById('searchInput').value = '';
+            loadCategories();
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+            }
+            
+            debugLog(`Message: ${text} (${type})`);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            debugLog('Page loaded');
+            
+            // Test if Firebase is working
+            setTimeout(() => {
+                if (!firebase.apps.length) {
+                    debugLog('WARNING: Firebase not initialized!', 'error');
+                    showMessage('Firebase not initialized. Please check console.', 'error');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
